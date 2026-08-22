@@ -48,4 +48,9 @@ def summarize_text(text, num_sentences=3):
     summary_sentences=heapq.nlargest(
         num_sentences, sentence_scores, key=sentence_scores.get
     )
-    summary_sentences.sort(key=lambda)
+    summary_sentences.sort(key=lambda s: sentences.index(s))
+    return " ".join(summary_sentences)
+
+#---UI design---
+st.title("AI Text Summarizer")
+st.subheader("Extract key insights from long articles in seconds
