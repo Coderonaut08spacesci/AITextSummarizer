@@ -49,16 +49,6 @@ def summarize_text(text, num_sentences=3):
         num_sentences, sentence_scores, key=sentence_scores.get
     )
     summary_sentences.sort(key=lambda s: sentences.index(s))
-<<<<<<< HEAD
-    return " ".join(summary_sentences)
-
-#---UI design---
-st.title("AI Text Summarizer")
-st.subheader("Extract key insights from long articles in seconds
-=======
-
-    return " ".join(summary_sentences)
-
 
 # --- UI Design ---
 st.title("📝 AI Text Summarizer")
@@ -66,4 +56,3 @@ st.subheader("Extract key insights from long articles in seconds using NLTK.")
 
 #Sidebar controls
 st.header()
->>>>>>> 62fbca4 (Updated from computer)
