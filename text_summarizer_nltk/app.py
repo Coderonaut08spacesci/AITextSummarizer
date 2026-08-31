@@ -55,4 +55,43 @@ st.title("📝 AI Text Summarizer")
 st.subheader("Extract key insights from long articles in seconds using NLTK.")
 
 #Sidebar controls
-st.header()
+st.subheader("Extract key insights from long articles in seconds using NLTK.")
+
+# Sidebar Controls
+st.sidebar.header("Settings")
+sentence_count = st.sidebar.slider(
+    "Number of sentences in summary:",
+    min_value=1,
+    max_value=10,
+    value=3,
+    step=1,
+)
+
+# Text Input Area
+input_text = st.text_area(
+    "Paste your text/article here:",
+    height=250,
+    placeholder="Paste a long news article, essay, or paper here...",
+)
+
+# Action Button
+if st.button("Summarize Text", type="primary"):
+    if not input_text.strip():
+        st.warning("⚠️ Please paste some text first before summarizing!")
+    else:
+        with st.spinner("Analyzing word frequencies and generating summary..."):
+            summary = summarize_text(input_text, num_sentences=sentence_count)
+
+        st.success("Summary Generated!")
+        st.markdown("### 📌 Summary Result:")
+        st.write(summary)
+
+        # Quick statistics metric
+        st.divider()
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Original Sentence Count", len(sent_tokenize(input_text)))
+        with col2:
+            st.metric(
+                "Summary Sentence Count", len(sent_tokenize(summary))
+            )
