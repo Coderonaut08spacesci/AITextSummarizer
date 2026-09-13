@@ -15,7 +15,8 @@ def download_nltk_resources():
     nltk.download("stopwords",quiet=True)
     nltk.download("punkt_tab",quiet=True)
 
-download_nltk_resources
+download_nltk_resources()
+
 #---Core Summarization Logic---
 def summarize_text(text, num_sentences=3):
     #1. Clean text
@@ -29,7 +30,7 @@ def summarize_text(text, num_sentences=3):
     stop_words=set(stopwords.words('english'))
     word_frequencies={}
     for word in words:
-        if word.isalnum() and word not in stopwords:
+        if word.isalnum() and word not in stop_words:
             word_frequencies[word]=word_frequencies.get(word,0)+1
     max_frequency=max(word_frequencies.values(),default=1)
     for word in word_frequencies.keys():
@@ -49,18 +50,12 @@ def summarize_text(text, num_sentences=3):
         num_sentences, sentence_scores, key=sentence_scores.get
     )
     summary_sentences.sort(key=lambda s: sentences.index(s))
+    return " ".join(summary_sentences)
 
-<<<<<<< HEAD
-#---UI design---
-st.title("AI Text Summarizer")
-=======
 # --- UI Design ---
 st.title("📝 AI Text Summarizer")
 st.subheader("Extract key insights from long articles in seconds using NLTK.")
 
-#Sidebar controls
->>>>>>> 13ad14dce7762c6834cc340b5745c4f1b82d159b
-st.subheader("Extract key insights from long articles in seconds using NLTK.")
 
 # Sidebar Controls
 st.sidebar.header("Settings")
