@@ -4,6 +4,12 @@ import streamlit as st
 from nltk.tokenize import sent_tokenize
 from summarizer import advanced_summarize
 
+import nltk
+
+nltk.download("punkt", quiet=True)
+nltk.download("punkt_tab", quiet=True)
+nltk.download("stopwords", quiet=True)
+
 # --- Page Configuration ---
 st.set_page_config(
     page_title="SummarizeAI Pro", page_icon="⚡", layout="wide"

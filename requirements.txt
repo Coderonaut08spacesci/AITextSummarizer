@@ -1,0 +1,5 @@
+nltk
+streamlit
+pypdf
+scikit-learn
+deep-translator
