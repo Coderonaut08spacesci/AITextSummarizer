@@ -1,97 +1,70 @@
-import heapq
-import re
-import nltk
+from deep_translator import GoogleTranslator
 import streamlit as st
-from nltk.corpus import stopwords
-from nltk.tokenize import sent_tokenize, word_tokenize
+from summarizer import advanced_summarize
+
 #---Streamlit Page Configuration---
 st.set_page_config(
-    page_title="AI Text Summarizer",page_icon="📝",layout="centered"
+    page_title="SummarizeAI Pro", page_icon="⚡", layout="wide"
 )
-#---NLTK Resource Downloader (Cached so it runs only once)---
-@st.cache_resource
-def download_nltk_resources():
-    nltk.download("punkt",quiet=True)
-    nltk.download("stopwords",quiet=True)
-    nltk.download("punkt_tab",quiet=True)
-
-download_nltk_resources()
-
-#---Core Summarization Logic---
-def summarize_text(text, num_sentences=3):
-    #1. Clean text
-    clean_text= re.sub(r'\[[0-9]*\]',' ',text)
-    clean_text=re.sub(r'\s+',' ',clean_text)
-    sentences=sent_tokenize(text)
-    words=word_tokenize(clean_text.lower())
-
-    if len(sentences)<=num_sentences:
-       return text
-    stop_words=set(stopwords.words('english'))
-    word_frequencies={}
-    for word in words:
-        if word.isalnum() and word not in stop_words:
-            word_frequencies[word]=word_frequencies.get(word,0)+1
-    max_frequency=max(word_frequencies.values(),default=1)
-    for word in word_frequencies.keys():
-        word_frequencies[word]/=max_frequency
-
-    #4. Score Sentences
-    sentence_scores={}
-    for sent in sentences:
-        for word in word_tokenize(sent.lower()):
-            if word in word_frequencies:
-                if len(sent.split(" "))<30:
-                    sentence_scores[sent]=(
-                        sentence_scores.get(sent,0)+word_frequencies[word]
-                    )
-    #5. Extract Top N sentences
-    summary_sentences=heapq.nlargest(
-        num_sentences, sentence_scores, key=sentence_scores.get
-    )
-    summary_sentences.sort(key=lambda s: sentences.index(s))
-    return " ".join(summary_sentences)
-
-# --- UI Design ---
-st.title("📝 AI Text Summarizer")
-st.subheader("Extract key insights from long articles in seconds using NLTK.")
-
-
-# Sidebar Controls
-st.sidebar.header("Settings")
-sentence_count = st.sidebar.slider(
-    "Number of sentences in summary:",
-    min_value=1,
-    max_value=10,
-    value=3,
-    step=1,
+# Custom CSS Injection
+st.markdown(
+    """
+    <style>
+    .main { background-color: #f8f9fa; }
+    .stButton>button {
+        background-color: #4F46E5;
+        color: white;
+        border-radius: 8px;
+        font-weight: bold;
+        border: none;
+        padding: 0.5rem 1rem;
+    }
+    .stButton>button:hover { background-color: #4338CA; color: white; }
+    .metric-card {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    </style>
+""",
+    unsafe_allow_html=True,
 )
 
-# Text Input Area
-input_text = st.text_area(
-    "Paste your text/article here:",
-    height=250,
-    placeholder="Paste a long news article, essay, or paper here...",
+st.title("⚡ SummarizeAI Pro")
+st.caption(
+    "Advanced TF-IDF Extractive Engine with Multi-Language Translation"
 )
 
-# Action Button
-if st.button("Summarize Text", type="primary"):
-    if not input_text.strip():
-        st.warning("⚠️ Please paste some text first before summarizing!")
-    else:
-        with st.spinner("Analyzing word frequencies and generating summary..."):
-            summary = summarize_text(input_text, num_sentences=sentence_count)
+# Sidebar
+st.sidebar.header("⚙️ Configuration")
+sentence_count = st.sidebar.slider("Summary Length", 1, 10, 3)
+target_lang = st.sidebar.selectbox(
+    "Output Language",
+    ["English", "Spanish", "French", "German", "Hindi", "Marathi"],
+)
+lang_codes = {
+    "English": "en",
+    "Spanish": "es",
+    "French": "fr",
+    "German": "de",
+    "Hindi": "hi",
+    "Marathi": "mr",
+}
 
-        st.success("Summary Generated!")
-        st.markdown("### 📌 Summary Result:")
-        st.write(summary)
+input_text = st.text_area("Source Text", height=200, placeholder="Paste here...")
 
-        # Quick statistics metric
-        st.divider()
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Original Sentence Count", len(sent_tokenize(input_text)))
-        with col2:
-            st.metric(
-                "Summary Sentence Count", len(sent_tokenize(summary))
-            )
+if st.button("Generate Smart Summary"):
+    if input_text.strip():
+        # 1. Advanced TF-IDF Summarization
+        raw_summary = advanced_summarize(input_text, num_sentences=sentence_count)
+        # 2. Multi-language translation
+        if target_lang != "English":
+            translated_summary = GoogleTranslator(
+                source="auto", target=lang_codes[target_lang]
+            ).translate(raw_summary)
+        else:
+            translated_summary = raw_summary
+
+        st.markdown("### 📌 Summary Result")
+        st.info(translated_summary)
